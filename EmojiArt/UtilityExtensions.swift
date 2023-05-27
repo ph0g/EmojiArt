@@ -49,6 +49,34 @@ extension CGPoint {
     }
 }
 
+extension CGSize {
+    // the center point of an area that is our size
+    var center: CGPoint {
+        CGPoint(x: width/2, y: height/2)
+    }
+    
+    static func +(lhs: Self, rhs: Self) -> CGSize {
+        CGSize(width: lhs.width + rhs.width, height: lhs.height + rhs.height)
+    }
+    
+    static func +=(lhs: inout Self, rhs: Self) {
+        lhs.width += rhs.width
+        lhs.height += rhs.height
+    }
+    
+    static func -(lhs: Self, rhs: Self) -> CGSize {
+        CGSize(width: lhs.width - rhs.width, height: lhs.height - rhs.height)
+    }
+    
+    static func *(lhs: Self, rhs: CGFloat) -> CGSize {
+        CGSize(width: lhs.width * rhs, height: lhs.height * rhs)
+    }
+
+    static func /(lhs: Self, rhs: CGFloat) -> CGSize {
+        CGSize(width: lhs.width / rhs, height: lhs.height / rhs)
+    }
+}
+
 extension Array where Element == NSItemProvider {
     func loadObjects<T>(ofType theType: T.Type, firstOnly: Bool = false, using load: @escaping (T) -> Void) -> Bool where T: NSItemProviderReading {
         if let provider = first(where: { $0.canLoadObject(ofClass: theType) }) {
@@ -104,5 +132,23 @@ extension Character {
         } else {
             return false
         }
+    }
+}
+
+// extracting the actual url to an image from a url that might contain other info
+// (essentially looking for the imgurl key)
+// imgurl is a "well known" key that can be embedded in a url that says that the actual image url is
+
+extension URL {
+    var imageURL: URL {
+        for query in query?.components(separatedBy: "&") ?? [] {
+            let queryComponents = query.components(separatedBy: "=")
+            if queryComponents.count == 2 {
+                if queryComponents[0] == "imgurl", let url = URL(string: queryComponents[1].removingPercentEncoding ?? "") {
+                    return url
+                }
+            }
+        }
+        return baseURL ?? self
     }
 }
