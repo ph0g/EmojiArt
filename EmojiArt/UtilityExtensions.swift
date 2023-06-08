@@ -36,6 +36,11 @@ extension CGPoint {
         CGPoint(x: lhs.x + rhs.width, y: lhs.y + rhs.height)
     }
     
+    static func +=(lhs: inout Self, rhs: CGSize) {
+        lhs.x += rhs.width
+        lhs.y += rhs.height
+    }
+    
     static func -(lhs: Self, rhs: CGSize) -> CGPoint {
         CGPoint(x: lhs.x - rhs.width, y: lhs.y - rhs.height)
     }
@@ -112,6 +117,24 @@ extension Array where Element == NSItemProvider {
     
     func loadFirstObject<T>(ofType theType: T.Type, using load: @escaping (T) -> Void) -> Bool where T: _ObjectiveCBridgeable, T._ObjectiveCType: NSItemProviderReading {
         loadObjects(ofType: theType, firstOnly: true, using: load)
+    }
+}
+
+extension Equatable where Self: Identifiable {
+    static func ==(lhs: Self, rhs: Self) -> Bool { lhs.id == rhs.id }
+}
+
+extension Hashable where Self: Identifiable {
+    func hash(into hasher: inout Hasher) { hasher.combine(id) }
+}
+
+extension Set where Element: Identifiable {
+    mutating func toggleMatching(_ element: Element) {
+        if contains(element) {
+            remove(element)
+        } else {
+            insert(element)
+        }
     }
 }
 

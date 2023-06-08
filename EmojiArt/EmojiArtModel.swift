@@ -36,4 +36,21 @@ struct EmojiArtModel {
         emojis.append(Emoji(text: text, x: location.x, y: location.y, size: size, id: uniqueEmojiId))
     }
     
+    mutating func remove(_ emoji: Emoji) {
+        guard let index = emojis.index(matching: emoji) else { return }
+        emojis.remove(at: index)
+    }
+    
+    mutating func move(_ emoji: Emoji, by offset: CGSize) {
+        if let index = emojis.index(matching: emoji) {
+            emojis[index].x += Int(offset.width)
+            emojis[index].y += Int(offset.height)
+        }
+    }
+    
+    mutating func scale(_ emoji: Emoji, by scale: CGFloat) {
+        if let index = emojis.index(matching: emoji) {        
+            emojis[index].size = Int((CGFloat(emojis[index].size) * scale).rounded(.toNearestOrAwayFromZero))
+        }
+    }
 }

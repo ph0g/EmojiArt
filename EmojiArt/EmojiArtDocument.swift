@@ -33,6 +33,9 @@ class EmojiArtDocument: ObservableObject {
         case fetching
     }
     
+    @Published private(set) var selectedEmojis = Set<EmojiArtModel.Emoji>()
+    @Published private(set) var hasSelectedEmojis = false
+    
     private func fetchBackgroundImageDataIfNecessary() {
         backgroundImage = nil
         switch emojiArt.background {
@@ -69,15 +72,40 @@ class EmojiArtDocument: ObservableObject {
     }
     
     func moveEmoji(_ emoji: EmojiArtModel.Emoji, by offset: CGSize) {
-        if let index = emojiArt.emojis.index(matching: emoji) {
-            emojiArt.emojis[index].x += Int(offset.width)
-            emojiArt.emojis[index].y += Int(offset.height)
+        emojiArt.move(emoji, by: offset)
+    }
+    
+    func moveSelectedEmojis(by offset: CGSize) {
+        for emoji in selectedEmojis {
+            moveEmoji(emoji, by: offset)
         }
     }
     
     func scaleEmoji(_ emoji: EmojiArtModel.Emoji, by scale: CGFloat) {
-        if let index = emojiArt.emojis.index(matching: emoji) {
-            emojiArt.emojis[index].size = Int((CGFloat(emojiArt.emojis[index].size) * scale).rounded(.toNearestOrAwayFromZero))
+            emojiArt.scale(emoji, by: scale)
+    }
+    
+    func scaleSelectedEmojis(by scale: CGFloat) {
+        for emoji in selectedEmojis {
+            scaleEmoji(emoji, by: scale)
         }
     }
+    
+    func deselectAllEmojis() {
+        selectedEmojis = []
+        hasSelectedEmojis = false
+    }
+    
+    func toggleSelection(of emoji: EmojiArtModel.Emoji) {
+        selectedEmojis.toggleMatching(emoji)
+        hasSelectedEmojis = !selectedEmojis.isEmpty
+    }
+    
+    func removeSelectedEmojis() {
+        for emoji in selectedEmojis {
+            emojiArt.remove(emoji)
+        }
+        selectedEmojis = []
+    }
+        
 }
